@@ -1,0 +1,2274 @@
+openapi: 3.1.0
+info:
+  title: NIST SP 800-53 (Rev. 5) — Sandbox API
+  version: 1.0.0
+  description: |
+    A **sandbox / simulation** API for managing security and privacy controls
+    defined in [NIST Special Publication 800-53 Revision 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final).
+
+    ## Key Concepts
+
+    | Concept | Description |
+    |---------|-------------|
+    | **Control Family** | One of 20 groups of related controls (AC, AT, AU, CA, CM, CP, IA, IR, MA, MP, PE, PL, PM, PS, PT, RA, SA, SC, SI, SR) |
+    | **Control** | A specific safeguard or countermeasure (e.g. AC-2 Account Management) |
+    | **Control Enhancement** | Additional functionality layered onto a base control (e.g. AC-2(1)) |
+    | **Baseline** | A predefined set of controls for a given impact level — Low, Moderate, or High (per SP 800-53B) |
+    | **System Security Plan (SSP)** | Documents the controls selected and implemented for an information system |
+    | **Control Implementation** | How a specific control is satisfied within an SSP |
+    | **Assessment** | Evaluation of control effectiveness (per SP 800-53A) |
+    | **POA&M** | Plan of Action & Milestones — tracks remediation of control deficiencies |
+
+    ## Microcks
+    Every operation carries `examples` (keyed `Default`) and an `x-microcks-operation`
+    extension so the spec can be imported directly into
+    [Microcks](https://microcks.io) for contract-first mocking.
+  contact:
+    name: Kin Lane
+    email: kinlane@naftiko.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+- url: https://sandbox.nist-800-53.example.com/api/v1
+  description: Sandbox
+- url: http://localhost:8080/api/v1
+  description: Local development
+tags:
+- name: Control Catalog
+  description: Read-only SP 800-53 Rev. 5 taxonomy — control families, controls, and enhancements.
+- name: Baselines
+  description: SP 800-53B security control baselines — Low, Moderate, and High impact levels.
+- name: Information Systems
+  description: Information systems registered in the sandbox for security planning.
+- name: System Security Plans
+  description: System Security Plans (SSPs) documenting selected and implemented controls.
+- name: Control Implementations
+  description: Per-control implementation statements within an SSP.
+- name: Assessments
+  description: Security control assessments evaluating the effectiveness of implemented controls.
+- name: POA&M
+  description: Plans of Action and Milestones tracking remediation of control deficiencies.
+security:
+- BearerAuth: []
+paths:
+  /catalog/families:
+    get:
+      operationId: listControlFamilies
+      summary: List all 20 SP 800-53 control families
+      tags:
+      - Control Catalog
+      responses:
+        '200':
+          description: All 20 control families
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ControlFamily'
+              examples:
+                Default:
+                  summary: All SP 800-53 Rev. 5 control families
+                  value:
+                  - id: AC
+                    name: Access Control
+                    description: Manage user permissions, system privileges, and remote access to ensure only authorized individuals
+                      access information systems.
+                    controlCount: 25
+                  - id: AT
+                    name: Awareness and Training
+                    description: Ensure personnel are adequately trained to carry out their information security responsibilities.
+                    controlCount: 6
+                  - id: AU
+                    name: Audit and Accountability
+                    description: Create, protect, and retain audit records to enable monitoring, analysis, and reporting of
+                      unlawful or unauthorized system activity.
+                    controlCount: 16
+                  - id: CA
+                    name: Assessment, Authorization, and Monitoring
+                    description: Assess security controls, authorize system operation, and monitor controls on an ongoing
+                      basis.
+                    controlCount: 9
+                  - id: CM
+                    name: Configuration Management
+                    description: Establish and maintain baseline configurations and inventories of organizational systems.
+                    controlCount: 14
+                  - id: CP
+                    name: Contingency Planning
+                    description: Establish, maintain, and implement plans for emergency response, backup operations, and post-disaster
+                      recovery.
+                    controlCount: 13
+                  - id: IA
+                    name: Identification and Authentication
+                    description: Identify and authenticate users, processes, and devices before granting access to systems.
+                    controlCount: 12
+                  - id: IR
+                    name: Incident Response
+                    description: Establish operational incident handling capabilities for organizational systems.
+                    controlCount: 10
+                  - id: MA
+                    name: Maintenance
+                    description: Perform timely maintenance on organizational systems and provide effective controls on maintenance
+                      tools and personnel.
+                    controlCount: 7
+                  - id: MP
+                    name: Media Protection
+                    description: Protect information system media, limit access, and sanitize or destroy media before disposal
+                      or reuse.
+                    controlCount: 8
+                  - id: PE
+                    name: Physical and Environmental Protection
+                    description: Limit physical access to systems and protect the physical plant and support infrastructure.
+                    controlCount: 23
+                  - id: PL
+                    name: Planning
+                    description: Develop, document, update, and implement security and privacy plans for organizational systems.
+                    controlCount: 11
+                  - id: PM
+                    name: Program Management
+                    description: Manage the organization-wide information security program and ensure compliance with applicable
+                      laws and policies.
+                    controlCount: 32
+                  - id: PS
+                    name: Personnel Security
+                    description: Ensure individuals occupying positions of responsibility are trustworthy and meet established
+                      security criteria.
+                    controlCount: 9
+                  - id: PT
+                    name: PII Processing and Transparency
+                    description: Manage personally identifiable information processing and provide transparency to individuals.
+                    controlCount: 8
+                  - id: RA
+                    name: Risk Assessment
+                    description: Assess risk to organizational operations, assets, individuals, and other organizations.
+                    controlCount: 10
+                  - id: SA
+                    name: System and Services Acquisition
+                    description: Allocate resources, manage the system development life cycle, and enforce acquisition process
+                      protections.
+                    controlCount: 23
+                  - id: SC
+                    name: System and Communications Protection
+                    description: Protect communications and control system boundaries to ensure confidentiality and integrity.
+                    controlCount: 51
+                  - id: SI
+                    name: System and Information Integrity
+                    description: Identify, report, and correct system flaws in a timely manner and protect against malicious
+                      code.
+                    controlCount: 23
+                  - id: SR
+                    name: Supply Chain Risk Management
+                    description: Manage supply chain risks by developing processes, agreements, and assessment procedures.
+                    controlCount: 12
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve all 20 SP 800-53 Rev. 5 control families with their identifiers, names, descriptions, and control
+        counts.
+  /catalog/families/{familyId}/controls:
+    get:
+      operationId: listControlsByFamily
+      summary: List controls in a control family
+      tags:
+      - Control Catalog
+      parameters:
+      - $ref: '#/components/parameters/FamilyIdPath'
+      responses:
+        '200':
+          description: Controls belonging to the family
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Control'
+              examples:
+                Default:
+                  summary: Access Control (AC) controls
+                  value:
+                  - id: AC-1
+                    familyId: AC
+                    title: Policy and Procedures
+                    description: Develop, document, and disseminate access control policy and procedures.
+                    priority: P1
+                    baselines:
+                      low: true
+                      moderate: true
+                      high: true
+                    enhancementCount: 0
+                  - id: AC-2
+                    familyId: AC
+                    title: Account Management
+                    description: Define and manage information system accounts including establishing, activating, modifying,
+                      reviewing, disabling, and removing accounts.
+                    priority: P1
+                    baselines:
+                      low: true
+                      moderate: true
+                      high: true
+                    enhancementCount: 13
+                  - id: AC-3
+                    familyId: AC
+                    title: Access Enforcement
+                    description: Enforce approved authorizations for logical access to information and system resources.
+                    priority: P1
+                    baselines:
+                      low: true
+                      moderate: true
+                      high: true
+                    enhancementCount: 15
+                  - id: AC-4
+                    familyId: AC
+                    title: Information Flow Enforcement
+                    description: Enforce approved authorizations for controlling the flow of information within the system
+                      and between connected systems.
+                    priority: P1
+                    baselines:
+                      low: false
+                      moderate: true
+                      high: true
+                    enhancementCount: 32
+                  - id: AC-5
+                    familyId: AC
+                    title: Separation of Duties
+                    description: Separate duties of individuals to prevent malicious activity without collusion.
+                    priority: P1
+                    baselines:
+                      low: false
+                      moderate: true
+                      high: true
+                    enhancementCount: 0
+                  - id: AC-6
+                    familyId: AC
+                    title: Least Privilege
+                    description: Employ the principle of least privilege, allowing only authorized accesses for users which
+                      are necessary to accomplish assigned organizational tasks.
+                    priority: P1
+                    baselines:
+                      low: false
+                      moderate: true
+                      high: true
+                    enhancementCount: 10
+                  - id: AC-7
+                    familyId: AC
+                    title: Unsuccessful Logon Attempts
+                    description: Enforce a limit of consecutive invalid logon attempts by a user and take defined actions
+                      when the maximum is exceeded.
+                    priority: P2
+                    baselines:
+                      low: true
+                      moderate: true
+                      high: true
+                    enhancementCount: 4
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve all controls belonging to a specific control family, including their priority, baseline applicability,
+        and enhancement count.
+  /catalog/controls/{controlId}:
+    get:
+      operationId: getControlDetail
+      summary: Get full control detail including enhancements
+      tags:
+      - Control Catalog
+      parameters:
+      - name: controlId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: AC-2
+      responses:
+        '200':
+          description: Control with enhancements and related controls
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlDetail'
+              examples:
+                Default:
+                  summary: AC-2 Account Management full detail
+                  value:
+                    id: AC-2
+                    familyId: AC
+                    title: Account Management
+                    description: Define and manage information system accounts including establishing, activating, modifying,
+                      reviewing, disabling, and removing accounts.
+                    priority: P1
+                    baselines:
+                      low: true
+                      moderate: true
+                      high: true
+                    discussion: Account management includes the identification of account types, establishing conditions for
+                      group and role membership, specifying authorized users, and managing system accounts.
+                    relatedControls:
+                    - AC-3
+                    - AC-5
+                    - AC-6
+                    - IA-2
+                    - IA-4
+                    - IA-5
+                    - IA-8
+                    enhancements:
+                    - id: AC-2(1)
+                      title: Automated System Account Management
+                      description: Support the management of system accounts using automated mechanisms.
+                      baselines:
+                        low: false
+                        moderate: true
+                        high: true
+                    - id: AC-2(2)
+                      title: Automated Temporary and Emergency Account Management
+                      description: Automatically remove or disable temporary and emergency accounts after a defined time period.
+                      baselines:
+                        low: false
+                        moderate: true
+                        high: true
+                    - id: AC-2(3)
+                      title: Disable Accounts
+                      description: Disable accounts when the accounts have not been used for a defined time period.
+                      baselines:
+                        low: false
+                        moderate: true
+                        high: true
+                    - id: AC-2(4)
+                      title: Automated Audit Actions
+                      description: Automatically audit account creation, modification, enabling, disabling, and removal actions.
+                      baselines:
+                        low: false
+                        moderate: true
+                        high: true
+                    - id: AC-2(5)
+                      title: Inactivity Logout
+                      description: Require users to log out after a defined time period of inactivity or when a specified
+                        condition occurs.
+                      baselines:
+                        low: false
+                        moderate: false
+                        high: true
+                    - id: AC-2(13)
+                      title: Disable Accounts for High-Risk Individuals
+                      description: Disable accounts of individuals within a defined time period of discovery of significant
+                        risk.
+                      baselines:
+                        low: false
+                        moderate: true
+                        high: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve the full detail for a specific control including its discussion, related controls, and all control
+        enhancements with baseline applicability.
+  /baselines:
+    get:
+      operationId: listBaselines
+      summary: List available security control baselines
+      tags:
+      - Baselines
+      responses:
+        '200':
+          description: Available baselines (Low, Moderate, High)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Baseline'
+              examples:
+                Default:
+                  summary: SP 800-53B baselines
+                  value:
+                  - id: low
+                    name: Low
+                    description: Baseline for low-impact information systems. Provides a starting point for the security control
+                      selection process.
+                    controlCount: 150
+                    source: NIST SP 800-53B
+                  - id: moderate
+                    name: Moderate
+                    description: Baseline for moderate-impact information systems. Includes all Low controls plus additional
+                      controls.
+                    controlCount: 304
+                    source: NIST SP 800-53B
+                  - id: high
+                    name: High
+                    description: Baseline for high-impact information systems. The most comprehensive baseline with the strongest
+                      protections.
+                    controlCount: 392
+                    source: NIST SP 800-53B
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve the three SP 800-53B security control baselines (Low, Moderate, High) with their control counts
+        and descriptions.
+  /baselines/{baselineId}/controls:
+    get:
+      operationId: listBaselineControls
+      summary: List controls included in a specific baseline
+      tags:
+      - Baselines
+      parameters:
+      - name: baselineId
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - low
+          - moderate
+          - high
+        example: moderate
+      - name: familyId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by control family (e.g. AC, IR)
+      responses:
+        '200':
+          description: Controls in the baseline
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaselineControlListResponse'
+              examples:
+                Default:
+                  summary: Moderate baseline controls filtered to AC family
+                  value:
+                    baselineId: moderate
+                    familyId: AC
+                    total: 12
+                    controls:
+                    - controlId: AC-1
+                      title: Policy and Procedures
+                      enhancementsIncluded: []
+                    - controlId: AC-2
+                      title: Account Management
+                      enhancementsIncluded:
+                      - AC-2(1)
+                      - AC-2(2)
+                      - AC-2(3)
+                      - AC-2(4)
+                      - AC-2(13)
+                    - controlId: AC-3
+                      title: Access Enforcement
+                      enhancementsIncluded: []
+                    - controlId: AC-4
+                      title: Information Flow Enforcement
+                      enhancementsIncluded: []
+                    - controlId: AC-5
+                      title: Separation of Duties
+                      enhancementsIncluded: []
+                    - controlId: AC-6
+                      title: Least Privilege
+                      enhancementsIncluded:
+                      - AC-6(1)
+                      - AC-6(2)
+                      - AC-6(5)
+                      - AC-6(9)
+                      - AC-6(10)
+                    - controlId: AC-7
+                      title: Unsuccessful Logon Attempts
+                      enhancementsIncluded: []
+                    - controlId: AC-8
+                      title: System Use Notification
+                      enhancementsIncluded: []
+                    - controlId: AC-11
+                      title: Device Lock
+                      enhancementsIncluded:
+                      - AC-11(1)
+                    - controlId: AC-12
+                      title: Session Termination
+                      enhancementsIncluded: []
+                    - controlId: AC-17
+                      title: Remote Access
+                      enhancementsIncluded:
+                      - AC-17(1)
+                      - AC-17(2)
+                      - AC-17(3)
+                      - AC-17(4)
+                    - controlId: AC-20
+                      title: Use of External Systems
+                      enhancementsIncluded:
+                      - AC-20(1)
+                      - AC-20(2)
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve the controls included in a specific baseline, optionally filtered by control family. Includes
+        which enhancements are required at that baseline level.
+  /systems:
+    get:
+      operationId: listSystems
+      summary: List registered information systems
+      tags:
+      - Information Systems
+      parameters:
+      - $ref: '#/components/parameters/LimitQuery'
+      - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated list of information systems
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemListResponse'
+              examples:
+                Default:
+                  summary: Registered systems
+                  value:
+                    total: 2
+                    limit: 20
+                    offset: 0
+                    items:
+                    - id: sys-hris-001
+                      name: Enterprise HRIS
+                      acronym: E-HRIS
+                      impactLevel: moderate
+                      description: Human Resources Information System processing PII for 12,000 employees.
+                      ownerOrganization: Acme Corporation
+                      authorizingOfficial: Jane Chen, CIO
+                      systemStatus: operational
+                      createdAt: '2025-01-10T08:00:00Z'
+                      updatedAt: '2025-07-15T12:30:00Z'
+                    - id: sys-fincore-002
+                      name: Financial Core Platform
+                      acronym: FinCore
+                      impactLevel: high
+                      description: Core financial transaction processing system for treasury operations.
+                      ownerOrganization: Acme Corporation
+                      authorizingOfficial: Robert Alvarez, CFO
+                      systemStatus: operational
+                      createdAt: '2025-02-01T09:00:00Z'
+                      updatedAt: '2025-08-01T14:00:00Z'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve a paginated list of information systems registered in the sandbox, including their impact levels
+        and authorization status.
+    post:
+      operationId: registerSystem
+      summary: Register a new information system
+      tags:
+      - Information Systems
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemCreate'
+            examples:
+              Default:
+                summary: Register the Enterprise HRIS
+                value:
+                  name: Enterprise HRIS
+                  acronym: E-HRIS
+                  impactLevel: moderate
+                  description: Human Resources Information System processing PII for 12,000 employees.
+                  ownerOrganization: Acme Corporation
+                  authorizingOfficial: Jane Chen, CIO
+                  systemType: major_application
+                  deploymentModel: hybrid
+                  operatingEnvironment: AWS GovCloud (us-gov-west-1) and on-premises data center.
+      responses:
+        '201':
+          description: System registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationSystem'
+              examples:
+                Default:
+                  summary: E-HRIS registered
+                  value:
+                    id: sys-hris-001
+                    name: Enterprise HRIS
+                    acronym: E-HRIS
+                    impactLevel: moderate
+                    description: Human Resources Information System processing PII for 12,000 employees.
+                    ownerOrganization: Acme Corporation
+                    authorizingOfficial: Jane Chen, CIO
+                    systemType: major_application
+                    deploymentModel: hybrid
+                    operatingEnvironment: AWS GovCloud (us-gov-west-1) and on-premises data center.
+                    systemStatus: under_development
+                    createdAt: '2025-01-10T08:00:00Z'
+                    updatedAt: '2025-01-10T08:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Register a new information system in the sandbox with its FIPS-199 impact level, deployment model, authorizing
+        official, and operating environment.
+  /systems/{systemId}:
+    get:
+      operationId: getSystem
+      summary: Get information system details
+      tags:
+      - Information Systems
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      responses:
+        '200':
+          description: System details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InformationSystem'
+              examples:
+                Default:
+                  summary: E-HRIS details
+                  value:
+                    id: sys-hris-001
+                    name: Enterprise HRIS
+                    acronym: E-HRIS
+                    impactLevel: moderate
+                    description: Human Resources Information System processing PII for 12,000 employees.
+                    ownerOrganization: Acme Corporation
+                    authorizingOfficial: Jane Chen, CIO
+                    systemType: major_application
+                    deploymentModel: hybrid
+                    operatingEnvironment: AWS GovCloud (us-gov-west-1) and on-premises data center.
+                    systemStatus: operational
+                    createdAt: '2025-01-10T08:00:00Z'
+                    updatedAt: '2025-07-15T12:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve full details for a specific information system including its type, deployment model, and current
+        operational status.
+  /systems/{systemId}/ssp:
+    get:
+      operationId: listSecurityPlans
+      summary: List SSPs for an information system
+      tags:
+      - System Security Plans
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      responses:
+        '200':
+          description: SSPs for the system
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityPlanSummary'
+              examples:
+                Default:
+                  summary: E-HRIS security plans
+                  value:
+                  - id: ssp-hris-001
+                    systemId: sys-hris-001
+                    title: E-HRIS System Security Plan v2.1
+                    baselineId: moderate
+                    status: approved
+                    version: '2.1'
+                    approvedDate: '2025-06-15T00:00:00Z'
+                    totalControls: 304
+                    implementedControls: 287
+                    partialControls: 12
+                    plannedControls: 5
+                    createdAt: '2025-01-15T10:00:00Z'
+                    updatedAt: '2025-06-15T16:00:00Z'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve all System Security Plans (SSPs) associated with an information system, including implementation
+        statistics and approval status.
+    post:
+      operationId: createSecurityPlan
+      summary: Create a new SSP
+      tags:
+      - System Security Plans
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityPlanCreate'
+            examples:
+              Default:
+                summary: Create E-HRIS SSP
+                value:
+                  title: E-HRIS System Security Plan v2.1
+                  baselineId: moderate
+                  version: '2.1'
+                  description: System Security Plan for the Enterprise HRIS. Documents all moderate-baseline controls and
+                    their implementation status.
+                  preparedBy: Sarah Kim, ISSO
+                  tailoringNotes: Removed PE-13 (Fire Protection) — system hosted entirely in FedRAMP-authorized cloud. Inherited
+                    from cloud provider.
+      responses:
+        '201':
+          description: SSP created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityPlan'
+              examples:
+                Default:
+                  summary: E-HRIS SSP created
+                  value:
+                    id: ssp-hris-001
+                    systemId: sys-hris-001
+                    title: E-HRIS System Security Plan v2.1
+                    baselineId: moderate
+                    status: draft
+                    version: '2.1'
+                    description: System Security Plan for the Enterprise HRIS. Documents all moderate-baseline controls and
+                      their implementation status.
+                    preparedBy: Sarah Kim, ISSO
+                    tailoringNotes: Removed PE-13 (Fire Protection) — system hosted entirely in FedRAMP-authorized cloud.
+                      Inherited from cloud provider.
+                    totalControls: 304
+                    implementedControls: 0
+                    partialControls: 0
+                    plannedControls: 0
+                    notImplementedControls: 304
+                    createdAt: '2025-01-15T10:00:00Z'
+                    updatedAt: '2025-01-15T10:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Create a new System Security Plan (SSP) for an information system by selecting a baseline and documenting
+        tailoring decisions.
+  /systems/{systemId}/ssp/{sspId}:
+    get:
+      operationId: getSecurityPlan
+      summary: Get a specific SSP with summary statistics
+      tags:
+      - System Security Plans
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - $ref: '#/components/parameters/SspIdPath'
+      responses:
+        '200':
+          description: Full SSP detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityPlan'
+              examples:
+                Default:
+                  summary: E-HRIS SSP detail
+                  value:
+                    id: ssp-hris-001
+                    systemId: sys-hris-001
+                    title: E-HRIS System Security Plan v2.1
+                    baselineId: moderate
+                    status: approved
+                    version: '2.1'
+                    description: System Security Plan for the Enterprise HRIS.
+                    preparedBy: Sarah Kim, ISSO
+                    approvedDate: '2025-06-15T00:00:00Z'
+                    tailoringNotes: Removed PE-13 — inherited from cloud provider.
+                    totalControls: 304
+                    implementedControls: 287
+                    partialControls: 12
+                    plannedControls: 5
+                    notImplementedControls: 0
+                    createdAt: '2025-01-15T10:00:00Z'
+                    updatedAt: '2025-06-15T16:00:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve a specific SSP with full metadata, implementation counts (implemented, partial, planned, not implemented),
+        and tailoring notes.
+    put:
+      operationId: updateSecurityPlan
+      summary: Update SSP metadata or status
+      tags:
+      - System Security Plans
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - $ref: '#/components/parameters/SspIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityPlanUpdate'
+            examples:
+              Default:
+                summary: Approve the E-HRIS SSP
+                value:
+                  status: approved
+                  approvedDate: '2025-06-15T00:00:00Z'
+      responses:
+        '200':
+          description: SSP updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityPlan'
+              examples:
+                Default:
+                  summary: SSP approved
+                  value:
+                    id: ssp-hris-001
+                    systemId: sys-hris-001
+                    title: E-HRIS System Security Plan v2.1
+                    baselineId: moderate
+                    status: approved
+                    version: '2.1'
+                    approvedDate: '2025-06-15T00:00:00Z'
+                    totalControls: 304
+                    implementedControls: 287
+                    partialControls: 12
+                    plannedControls: 5
+                    notImplementedControls: 0
+                    createdAt: '2025-01-15T10:00:00Z'
+                    updatedAt: '2025-06-15T16:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Update SSP metadata, advance its lifecycle status (draft → in_review → approved), or record approval dates
+        and tailoring changes.
+  /systems/{systemId}/ssp/{sspId}/implementations:
+    get:
+      operationId: listControlImplementations
+      summary: List control implementations in an SSP
+      tags:
+      - Control Implementations
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - $ref: '#/components/parameters/SspIdPath'
+      - name: familyId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by control family
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - implemented
+          - partially_implemented
+          - planned
+          - not_implemented
+          - not_applicable
+      - $ref: '#/components/parameters/LimitQuery'
+      - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Control implementations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlImplementationListResponse'
+              examples:
+                Default:
+                  summary: AC family implementations for E-HRIS
+                  value:
+                    total: 3
+                    limit: 20
+                    offset: 0
+                    items:
+                    - id: impl-hris-ac2-001
+                      sspId: ssp-hris-001
+                      controlId: AC-2
+                      controlTitle: Account Management
+                      status: implemented
+                      responsibleRole: Identity & Access Management Team
+                      implementationDescription: User accounts are managed through Okta Universal Directory integrated with
+                        Active Directory. Automated provisioning and de-provisioning via SCIM. Quarterly access reviews conducted
+                        using SailPoint IdentityIQ.
+                      implementationType: system_specific
+                      satisfiedEnhancements:
+                      - AC-2(1)
+                      - AC-2(2)
+                      - AC-2(3)
+                      - AC-2(4)
+                      updatedAt: '2025-05-20T11:00:00Z'
+                    - id: impl-hris-ac3-001
+                      sspId: ssp-hris-001
+                      controlId: AC-3
+                      controlTitle: Access Enforcement
+                      status: implemented
+                      responsibleRole: Application Security Team
+                      implementationDescription: Role-based access control (RBAC) enforced at the application layer. API gateway
+                        enforces OAuth 2.0 scopes. Database-level row security for PII segregation.
+                      implementationType: system_specific
+                      satisfiedEnhancements: []
+                      updatedAt: '2025-05-20T11:30:00Z'
+                    - id: impl-hris-ac4-001
+                      sspId: ssp-hris-001
+                      controlId: AC-4
+                      controlTitle: Information Flow Enforcement
+                      status: partially_implemented
+                      responsibleRole: Network Security Team
+                      implementationDescription: 'East-west traffic controlled via micro-segmentation in AWS VPC. DLP policies
+                        applied to outbound email. Gap: No DLP coverage for cloud storage file sharing.'
+                      implementationType: hybrid
+                      satisfiedEnhancements: []
+                      updatedAt: '2025-05-22T09:00:00Z'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve control implementation statements within an SSP, optionally filtered by control family or implementation
+        status.
+    post:
+      operationId: createControlImplementation
+      summary: Add a control implementation to an SSP
+      tags:
+      - Control Implementations
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - $ref: '#/components/parameters/SspIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlImplementationCreate'
+            examples:
+              Default:
+                summary: Implement AC-2 for E-HRIS
+                value:
+                  controlId: AC-2
+                  status: implemented
+                  responsibleRole: Identity & Access Management Team
+                  implementationDescription: User accounts are managed through Okta Universal Directory integrated with Active
+                    Directory. Automated provisioning and de-provisioning via SCIM. Quarterly access reviews conducted using
+                    SailPoint IdentityIQ.
+                  implementationType: system_specific
+                  satisfiedEnhancements:
+                  - AC-2(1)
+                  - AC-2(2)
+                  - AC-2(3)
+                  - AC-2(4)
+      responses:
+        '201':
+          description: Implementation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlImplementation'
+              examples:
+                Default:
+                  summary: AC-2 implementation recorded
+                  value:
+                    id: impl-hris-ac2-001
+                    sspId: ssp-hris-001
+                    controlId: AC-2
+                    controlTitle: Account Management
+                    status: implemented
+                    responsibleRole: Identity & Access Management Team
+                    implementationDescription: User accounts are managed through Okta Universal Directory integrated with
+                      Active Directory. Automated provisioning and de-provisioning via SCIM. Quarterly access reviews conducted
+                      using SailPoint IdentityIQ.
+                    implementationType: system_specific
+                    satisfiedEnhancements:
+                    - AC-2(1)
+                    - AC-2(2)
+                    - AC-2(3)
+                    - AC-2(4)
+                    createdAt: '2025-05-20T11:00:00Z'
+                    updatedAt: '2025-05-20T11:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Add a control implementation statement to an SSP, documenting how a specific control is satisfied with
+        its responsible role and covered enhancements.
+  /systems/{systemId}/assessments:
+    get:
+      operationId: listAssessments
+      summary: List security control assessments
+      tags:
+      - Assessments
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      responses:
+        '200':
+          description: Assessments for the system
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssessmentSummary'
+              examples:
+                Default:
+                  summary: E-HRIS assessments
+                  value:
+                  - id: assess-hris-2025q2
+                    systemId: sys-hris-001
+                    sspId: ssp-hris-001
+                    title: E-HRIS FY2025 Q2 Security Assessment
+                    assessor: Deloitte Cyber Risk Services
+                    assessmentType: comprehensive
+                    status: completed
+                    totalFindings: 17
+                    satisfiedControls: 287
+                    otherThanSatisfied: 17
+                    completedAt: '2025-06-01T00:00:00Z'
+                    createdAt: '2025-04-01T08:00:00Z'
+                    updatedAt: '2025-06-01T16:00:00Z'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve security control assessments for an information system, including summary statistics on satisfied
+        and other-than-satisfied determinations.
+    post:
+      operationId: createAssessment
+      summary: Create a new security control assessment
+      tags:
+      - Assessments
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentCreate'
+            examples:
+              Default:
+                summary: Start Q2 2025 assessment
+                value:
+                  sspId: ssp-hris-001
+                  title: E-HRIS FY2025 Q2 Security Assessment
+                  assessor: Deloitte Cyber Risk Services
+                  assessmentType: comprehensive
+                  scope: All moderate-baseline controls in the E-HRIS SSP v2.1.
+                  methodology: NIST SP 800-53A examination, interview, and test procedures.
+                  controlFindings:
+                  - controlId: AC-2
+                    determination: satisfied
+                    assessmentMethod: test
+                    evidence: Reviewed Okta audit logs and SailPoint access certification reports for Q1–Q2. All accounts
+                      provisioned and de-provisioned per policy.
+                  - controlId: AC-4
+                    determination: other_than_satisfied
+                    assessmentMethod: examine
+                    evidence: DLP policies cover email but not cloud file sharing (Box, SharePoint Online). Exfiltration via
+                      shared links is not monitored.
+                    weaknessDescription: Information flow enforcement does not extend to cloud collaboration platforms.
+                    riskLevel: moderate
+                  - controlId: IR-4
+                    determination: other_than_satisfied
+                    assessmentMethod: interview
+                    evidence: IR team confirmed playbooks exist but the last tabletop exercise was 14 months ago. SLA for
+                      initial triage is 4 hours but no metrics are tracked.
+                    weaknessDescription: Incident response procedures are not regularly tested and lack performance metrics.
+                    riskLevel: moderate
+                  - controlId: SI-2
+                    determination: other_than_satisfied
+                    assessmentMethod: test
+                    evidence: Vulnerability scan of 2025-05-15 showed 23 critical CVEs unpatched beyond the 30-day SLA. Oldest
+                      unpatched CVE is 97 days.
+                    weaknessDescription: Flaw remediation process does not meet the 30-day SLA for critical vulnerabilities.
+                    riskLevel: high
+      responses:
+        '201':
+          description: Assessment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+              examples:
+                Default:
+                  summary: Assessment created
+                  value:
+                    id: assess-hris-2025q2
+                    systemId: sys-hris-001
+                    sspId: ssp-hris-001
+                    title: E-HRIS FY2025 Q2 Security Assessment
+                    assessor: Deloitte Cyber Risk Services
+                    assessmentType: comprehensive
+                    status: in_progress
+                    scope: All moderate-baseline controls in the E-HRIS SSP v2.1.
+                    methodology: NIST SP 800-53A examination, interview, and test procedures.
+                    totalFindings: 3
+                    satisfiedControls: 1
+                    otherThanSatisfied: 3
+                    controlFindings:
+                    - controlId: AC-2
+                      determination: satisfied
+                      assessmentMethod: test
+                      evidence: Reviewed Okta audit logs and SailPoint access certification reports for Q1–Q2.
+                    - controlId: AC-4
+                      determination: other_than_satisfied
+                      assessmentMethod: examine
+                      evidence: DLP policies cover email but not cloud file sharing.
+                      weaknessDescription: Information flow enforcement does not extend to cloud collaboration platforms.
+                      riskLevel: moderate
+                    - controlId: IR-4
+                      determination: other_than_satisfied
+                      assessmentMethod: interview
+                      evidence: IR team confirmed playbooks exist but the last tabletop exercise was 14 months ago.
+                      weaknessDescription: Incident response procedures are not regularly tested.
+                      riskLevel: moderate
+                    - controlId: SI-2
+                      determination: other_than_satisfied
+                      assessmentMethod: test
+                      evidence: 23 critical CVEs unpatched beyond the 30-day SLA.
+                      weaknessDescription: Flaw remediation process does not meet the 30-day SLA for critical vulnerabilities.
+                      riskLevel: high
+                    createdAt: '2025-04-01T08:00:00Z'
+                    updatedAt: '2025-04-01T08:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Create a new security control assessment with per-control findings using SP 800-53A assessment methods
+        (examine, interview, test).
+  /systems/{systemId}/assessments/{assessmentId}:
+    get:
+      operationId: getAssessment
+      summary: Get full assessment with findings
+      tags:
+      - Assessments
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - name: assessmentId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: assess-hris-2025q2
+      responses:
+        '200':
+          description: Assessment detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+              examples:
+                Default:
+                  summary: Completed E-HRIS assessment
+                  value:
+                    id: assess-hris-2025q2
+                    systemId: sys-hris-001
+                    sspId: ssp-hris-001
+                    title: E-HRIS FY2025 Q2 Security Assessment
+                    assessor: Deloitte Cyber Risk Services
+                    assessmentType: comprehensive
+                    status: completed
+                    totalFindings: 3
+                    satisfiedControls: 1
+                    otherThanSatisfied: 3
+                    controlFindings:
+                    - controlId: AC-4
+                      determination: other_than_satisfied
+                      assessmentMethod: examine
+                      evidence: DLP gaps on cloud file sharing.
+                      weaknessDescription: Information flow enforcement does not extend to cloud collaboration platforms.
+                      riskLevel: moderate
+                    - controlId: IR-4
+                      determination: other_than_satisfied
+                      assessmentMethod: interview
+                      evidence: IR tabletop exercises overdue.
+                      weaknessDescription: Incident response procedures not regularly tested.
+                      riskLevel: moderate
+                    - controlId: SI-2
+                      determination: other_than_satisfied
+                      assessmentMethod: test
+                      evidence: 23 critical CVEs beyond SLA.
+                      weaknessDescription: Flaw remediation SLA not met.
+                      riskLevel: high
+                    completedAt: '2025-06-01T00:00:00Z'
+                    createdAt: '2025-04-01T08:00:00Z'
+                    updatedAt: '2025-06-01T16:00:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve the full assessment detail including all control findings, weakness descriptions, risk levels,
+        and assessment methodology.
+    patch:
+      operationId: updateAssessmentStatus
+      summary: Update assessment status
+      tags:
+      - Assessments
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - name: assessmentId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: assess-hris-2025q2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentStatusUpdate'
+            examples:
+              Default:
+                summary: Complete the assessment
+                value:
+                  status: completed
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+              examples:
+                Default:
+                  summary: Assessment completed
+                  value:
+                    id: assess-hris-2025q2
+                    systemId: sys-hris-001
+                    sspId: ssp-hris-001
+                    title: E-HRIS FY2025 Q2 Security Assessment
+                    status: completed
+                    completedAt: '2025-06-01T16:00:00Z'
+                    createdAt: '2025-04-01T08:00:00Z'
+                    updatedAt: '2025-06-01T16:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Advance the assessment lifecycle status (in_progress → in_review → completed) or cancel the assessment.
+  /systems/{systemId}/poam:
+    get:
+      operationId: listPoamItems
+      summary: List POA&M items for an information system
+      tags:
+      - POA&M
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - open
+          - in_progress
+          - completed
+          - accepted_risk
+          - cancelled
+      - $ref: '#/components/parameters/LimitQuery'
+      - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: POA&M items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoamListResponse'
+              examples:
+                Default:
+                  summary: E-HRIS open POA&M items
+                  value:
+                    total: 3
+                    limit: 20
+                    offset: 0
+                    items:
+                    - id: poam-hris-001
+                      systemId: sys-hris-001
+                      assessmentId: assess-hris-2025q2
+                      controlId: AC-4
+                      weaknessDescription: Information flow enforcement does not extend to cloud collaboration platforms.
+                      riskLevel: moderate
+                      status: in_progress
+                      milestone: Deploy Microsoft Purview DLP to SharePoint Online and Box.
+                      scheduledCompletionDate: '2025-09-30T00:00:00Z'
+                      responsiblePoc: Mike Torres, Network Security Lead
+                      estimatedCostUsd: 45000
+                      createdAt: '2025-06-05T10:00:00Z'
+                      updatedAt: '2025-07-15T09:00:00Z'
+                    - id: poam-hris-002
+                      systemId: sys-hris-001
+                      assessmentId: assess-hris-2025q2
+                      controlId: IR-4
+                      weaknessDescription: Incident response procedures are not regularly tested and lack performance metrics.
+                      riskLevel: moderate
+                      status: open
+                      milestone: Conduct tabletop exercise and establish MTTD/MTTR metrics.
+                      scheduledCompletionDate: '2025-08-31T00:00:00Z'
+                      responsiblePoc: Lisa Park, IR Manager
+                      estimatedCostUsd: 15000
+                      createdAt: '2025-06-05T10:00:00Z'
+                      updatedAt: '2025-06-05T10:00:00Z'
+                    - id: poam-hris-003
+                      systemId: sys-hris-001
+                      assessmentId: assess-hris-2025q2
+                      controlId: SI-2
+                      weaknessDescription: Flaw remediation process does not meet the 30-day SLA for critical vulnerabilities.
+                      riskLevel: high
+                      status: in_progress
+                      milestone: Patch 23 critical CVEs; implement automated patching pipeline for OS and middleware.
+                      scheduledCompletionDate: '2025-08-15T00:00:00Z'
+                      responsiblePoc: David Nguyen, Vulnerability Management Lead
+                      estimatedCostUsd: 60000
+                      createdAt: '2025-06-05T10:00:00Z'
+                      updatedAt: '2025-07-20T14:00:00Z'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve POA&M items for an information system, optionally filtered by remediation status (open, in_progress,
+        completed, accepted_risk).
+    post:
+      operationId: createPoamItem
+      summary: Create a POA&M item from an assessment finding
+      tags:
+      - POA&M
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoamItemCreate'
+            examples:
+              Default:
+                summary: Create POA&M for SI-2 patching gap
+                value:
+                  assessmentId: assess-hris-2025q2
+                  controlId: SI-2
+                  weaknessDescription: Flaw remediation process does not meet the 30-day SLA for critical vulnerabilities.
+                  riskLevel: high
+                  milestone: Patch 23 critical CVEs; implement automated patching pipeline for OS and middleware.
+                  scheduledCompletionDate: '2025-08-15T00:00:00Z'
+                  responsiblePoc: David Nguyen, Vulnerability Management Lead
+                  estimatedCostUsd: 60000
+                  remediationPlan: 'Phase 1: Emergency patching of 23 critical CVEs (2 weeks). Phase 2: Deploy WSUS/SCCM automated
+                    pipeline (6 weeks). Phase 3: Integrate with vulnerability scanner for continuous compliance.'
+      responses:
+        '201':
+          description: POA&M item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoamItem'
+              examples:
+                Default:
+                  summary: SI-2 POA&M created
+                  value:
+                    id: poam-hris-003
+                    systemId: sys-hris-001
+                    assessmentId: assess-hris-2025q2
+                    controlId: SI-2
+                    weaknessDescription: Flaw remediation process does not meet the 30-day SLA for critical vulnerabilities.
+                    riskLevel: high
+                    status: open
+                    milestone: Patch 23 critical CVEs; implement automated patching pipeline for OS and middleware.
+                    scheduledCompletionDate: '2025-08-15T00:00:00Z'
+                    responsiblePoc: David Nguyen, Vulnerability Management Lead
+                    estimatedCostUsd: 60000
+                    remediationPlan: 'Phase 1: Emergency patching of 23 critical CVEs (2 weeks). Phase 2: Deploy WSUS/SCCM
+                      automated pipeline (6 weeks). Phase 3: Integrate with vulnerability scanner for continuous compliance.'
+                    createdAt: '2025-06-05T10:00:00Z'
+                    updatedAt: '2025-06-05T10:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Create a POA&M item from an assessment finding, documenting the weakness, remediation plan, milestone,
+        responsible POC, and estimated cost.
+  /systems/{systemId}/poam/{poamId}:
+    get:
+      operationId: getPoamItem
+      summary: Get a specific POA&M item
+      tags:
+      - POA&M
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - name: poamId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: poam-hris-003
+      responses:
+        '200':
+          description: POA&M item detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoamItem'
+              examples:
+                Default:
+                  summary: SI-2 POA&M detail
+                  value:
+                    id: poam-hris-003
+                    systemId: sys-hris-001
+                    assessmentId: assess-hris-2025q2
+                    controlId: SI-2
+                    weaknessDescription: Flaw remediation process does not meet the 30-day SLA for critical vulnerabilities.
+                    riskLevel: high
+                    status: in_progress
+                    milestone: Patch 23 critical CVEs; implement automated patching pipeline.
+                    scheduledCompletionDate: '2025-08-15T00:00:00Z'
+                    responsiblePoc: David Nguyen, Vulnerability Management Lead
+                    estimatedCostUsd: 60000
+                    remediationPlan: 'Phase 1: Emergency patching. Phase 2: Automated pipeline. Phase 3: Continuous compliance.'
+                    createdAt: '2025-06-05T10:00:00Z'
+                    updatedAt: '2025-07-20T14:00:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Retrieve a specific POA&M item with its full remediation plan, milestones, cost estimates, and completion
+        status.
+    patch:
+      operationId: updatePoamItem
+      summary: Update a POA&M item (status, milestone, completion)
+      tags:
+      - POA&M
+      parameters:
+      - $ref: '#/components/parameters/SystemIdPath'
+      - name: poamId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: poam-hris-003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoamItemUpdate'
+            examples:
+              Default:
+                summary: Mark SI-2 POA&M as completed
+                value:
+                  status: completed
+                  actualCompletionDate: '2025-08-10T00:00:00Z'
+                  completionNotes: All 23 critical CVEs patched. WSUS/SCCM pipeline deployed and integrated with Tenable.io
+                    for continuous compliance monitoring.
+      responses:
+        '200':
+          description: POA&M item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoamItem'
+              examples:
+                Default:
+                  summary: SI-2 POA&M completed
+                  value:
+                    id: poam-hris-003
+                    systemId: sys-hris-001
+                    controlId: SI-2
+                    status: completed
+                    actualCompletionDate: '2025-08-10T00:00:00Z'
+                    completionNotes: All 23 critical CVEs patched. WSUS/SCCM pipeline deployed.
+                    createdAt: '2025-06-05T10:00:00Z'
+                    updatedAt: '2025-08-10T16:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-microcks-operation:
+        dispatcher: SCRIPT
+        dispatcherRules: return "Default"
+      description: Update a POA&M item's status, milestone, scheduled or actual completion date, or record completion notes.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Sandbox JWT — use `Authorization: Bearer sandbox-token-hris-001` for testing.'
+  parameters:
+    FamilyIdPath:
+      name: familyId
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+        - AC
+        - AT
+        - AU
+        - CA
+        - CM
+        - CP
+        - IA
+        - IR
+        - MA
+        - MP
+        - PE
+        - PL
+        - PM
+        - PS
+        - PT
+        - RA
+        - SA
+        - SC
+        - SI
+        - SR
+      example: AC
+    SystemIdPath:
+      name: systemId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: sys-hris-001
+    SspIdPath:
+      name: sspId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ssp-hris-001
+    LimitQuery:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+    OffsetQuery:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+  responses:
+    BadRequest:
+      description: Invalid request body or parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            BadRequest:
+              value:
+                code: BAD_REQUEST
+                message: 'Validation failed: ''controlId'' is required.'
+                details:
+                - field: controlId
+                  issue: must not be blank
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            NotFound:
+              value:
+                code: NOT_FOUND
+                message: The requested resource was not found.
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              issue:
+                type: string
+    ControlFamily:
+      type: object
+      required:
+      - id
+      - name
+      - description
+      - controlCount
+      properties:
+        id:
+          type: string
+          enum:
+          - AC
+          - AT
+          - AU
+          - CA
+          - CM
+          - CP
+          - IA
+          - IR
+          - MA
+          - MP
+          - PE
+          - PL
+          - PM
+          - PS
+          - PT
+          - RA
+          - SA
+          - SC
+          - SI
+          - SR
+        name:
+          type: string
+        description:
+          type: string
+        controlCount:
+          type: integer
+    BaselineApplicability:
+      type: object
+      required:
+      - low
+      - moderate
+      - high
+      properties:
+        low:
+          type: boolean
+        moderate:
+          type: boolean
+        high:
+          type: boolean
+    Control:
+      type: object
+      required:
+      - id
+      - familyId
+      - title
+      - description
+      - priority
+      - baselines
+      properties:
+        id:
+          type: string
+          description: Control identifier, e.g. AC-2
+        familyId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        priority:
+          type: string
+          enum:
+          - P1
+          - P2
+          - P3
+          - P0
+          description: P1=highest, P0=not assigned
+        baselines:
+          $ref: '#/components/schemas/BaselineApplicability'
+        enhancementCount:
+          type: integer
+    ControlEnhancement:
+      type: object
+      required:
+      - id
+      - title
+      - description
+      - baselines
+      properties:
+        id:
+          type: string
+          description: Enhancement identifier, e.g. AC-2(1)
+        title:
+          type: string
+        description:
+          type: string
+        baselines:
+          $ref: '#/components/schemas/BaselineApplicability'
+    ControlDetail:
+      allOf:
+      - $ref: '#/components/schemas/Control'
+      - type: object
+        properties:
+          discussion:
+            type: string
+          relatedControls:
+            type: array
+            items:
+              type: string
+          enhancements:
+            type: array
+            items:
+              $ref: '#/components/schemas/ControlEnhancement'
+    Baseline:
+      type: object
+      required:
+      - id
+      - name
+      - description
+      - controlCount
+      - source
+      properties:
+        id:
+          type: string
+          enum:
+          - low
+          - moderate
+          - high
+        name:
+          type: string
+        description:
+          type: string
+        controlCount:
+          type: integer
+        source:
+          type: string
+    BaselineControlEntry:
+      type: object
+      required:
+      - controlId
+      - title
+      properties:
+        controlId:
+          type: string
+        title:
+          type: string
+        enhancementsIncluded:
+          type: array
+          items:
+            type: string
+    BaselineControlListResponse:
+      type: object
+      required:
+      - baselineId
+      - total
+      - controls
+      properties:
+        baselineId:
+          type: string
+        familyId:
+          type: string
+        total:
+          type: integer
+        controls:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaselineControlEntry'
+    SystemCreate:
+      type: object
+      required:
+      - name
+      - acronym
+      - impactLevel
+      - ownerOrganization
+      - authorizingOfficial
+      properties:
+        name:
+          type: string
+        acronym:
+          type: string
+        impactLevel:
+          type: string
+          enum:
+          - low
+          - moderate
+          - high
+        description:
+          type: string
+        ownerOrganization:
+          type: string
+        authorizingOfficial:
+          type: string
+        systemType:
+          type: string
+          enum:
+          - major_application
+          - general_support_system
+          - minor_application
+        deploymentModel:
+          type: string
+          enum:
+          - on_premises
+          - cloud
+          - hybrid
+        operatingEnvironment:
+          type: string
+    InformationSystem:
+      allOf:
+      - $ref: '#/components/schemas/SystemCreate'
+      - type: object
+        required:
+        - id
+        - systemStatus
+        - createdAt
+        - updatedAt
+        properties:
+          id:
+            type: string
+          systemStatus:
+            type: string
+            enum:
+            - under_development
+            - operational
+            - undergoing_major_modification
+            - disposition
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+    SystemListResponse:
+      type: object
+      required:
+      - total
+      - limit
+      - offset
+      - items
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InformationSystem'
+    SecurityPlanCreate:
+      type: object
+      required:
+      - title
+      - baselineId
+      - version
+      properties:
+        title:
+          type: string
+        baselineId:
+          type: string
+          enum:
+          - low
+          - moderate
+          - high
+        version:
+          type: string
+        description:
+          type: string
+        preparedBy:
+          type: string
+        tailoringNotes:
+          type: string
+    SecurityPlanUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - in_review
+          - approved
+          - revoked
+        version:
+          type: string
+        description:
+          type: string
+        approvedDate:
+          type: string
+          format: date-time
+        tailoringNotes:
+          type: string
+    SecurityPlanSummary:
+      type: object
+      required:
+      - id
+      - systemId
+      - title
+      - baselineId
+      - status
+      - totalControls
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+        systemId:
+          type: string
+        title:
+          type: string
+        baselineId:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - in_review
+          - approved
+          - revoked
+        version:
+          type: string
+        approvedDate:
+          type: string
+          format: date-time
+        totalControls:
+          type: integer
+        implementedControls:
+          type: integer
+        partialControls:
+          type: integer
+        plannedControls:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    SecurityPlan:
+      allOf:
+      - $ref: '#/components/schemas/SecurityPlanSummary'
+      - type: object
+        properties:
+          description:
+            type: string
+          preparedBy:
+            type: string
+          tailoringNotes:
+            type: string
+          notImplementedControls:
+            type: integer
+    ControlImplementationCreate:
+      type: object
+      required:
+      - controlId
+      - status
+      - implementationDescription
+      properties:
+        controlId:
+          type: string
+        status:
+          type: string
+          enum:
+          - implemented
+          - partially_implemented
+          - planned
+          - not_implemented
+          - not_applicable
+        responsibleRole:
+          type: string
+        implementationDescription:
+          type: string
+        implementationType:
+          type: string
+          enum:
+          - common
+          - system_specific
+          - hybrid
+          description: common=inherited, system_specific=local, hybrid=mix
+        satisfiedEnhancements:
+          type: array
+          items:
+            type: string
+    ControlImplementation:
+      allOf:
+      - $ref: '#/components/schemas/ControlImplementationCreate'
+      - type: object
+        required:
+        - id
+        - sspId
+        - controlTitle
+        - createdAt
+        - updatedAt
+        properties:
+          id:
+            type: string
+          sspId:
+            type: string
+          controlTitle:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+    ControlImplementationListResponse:
+      type: object
+      required:
+      - total
+      - limit
+      - offset
+      - items
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlImplementation'
+    ControlFinding:
+      type: object
+      required:
+      - controlId
+      - determination
+      - assessmentMethod
+      properties:
+        controlId:
+          type: string
+        determination:
+          type: string
+          enum:
+          - satisfied
+          - other_than_satisfied
+          description: 'Per SP 800-53A: satisfied or other-than-satisfied.'
+        assessmentMethod:
+          type: string
+          enum:
+          - examine
+          - interview
+          - test
+        evidence:
+          type: string
+        weaknessDescription:
+          type: string
+        riskLevel:
+          type: string
+          enum:
+          - low
+          - moderate
+          - high
+          - critical
+    AssessmentCreate:
+      type: object
+      required:
+      - sspId
+      - title
+      - assessor
+      - assessmentType
+      - controlFindings
+      properties:
+        sspId:
+          type: string
+        title:
+          type: string
+        assessor:
+          type: string
+        assessmentType:
+          type: string
+          enum:
+          - comprehensive
+          - focused
+          - delta
+        scope:
+          type: string
+        methodology:
+          type: string
+        controlFindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlFinding'
+    AssessmentStatusUpdate:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - in_progress
+          - in_review
+          - completed
+          - cancelled
+    AssessmentSummary:
+      type: object
+      required:
+      - id
+      - systemId
+      - sspId
+      - title
+      - status
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+        systemId:
+          type: string
+        sspId:
+          type: string
+        title:
+          type: string
+        assessor:
+          type: string
+        assessmentType:
+          type: string
+        status:
+          type: string
+          enum:
+          - in_progress
+          - in_review
+          - completed
+          - cancelled
+        totalFindings:
+          type: integer
+        satisfiedControls:
+          type: integer
+        otherThanSatisfied:
+          type: integer
+        completedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Assessment:
+      allOf:
+      - $ref: '#/components/schemas/AssessmentSummary'
+      - type: object
+        properties:
+          scope:
+            type: string
+          methodology:
+            type: string
+          controlFindings:
+            type: array
+            items:
+              $ref: '#/components/schemas/ControlFinding'
+    PoamItemCreate:
+      type: object
+      required:
+      - assessmentId
+      - controlId
+      - weaknessDescription
+      - riskLevel
+      - milestone
+      - scheduledCompletionDate
+      - responsiblePoc
+      properties:
+        assessmentId:
+          type: string
+        controlId:
+          type: string
+        weaknessDescription:
+          type: string
+        riskLevel:
+          type: string
+          enum:
+          - low
+          - moderate
+          - high
+          - critical
+        milestone:
+          type: string
+        scheduledCompletionDate:
+          type: string
+          format: date-time
+        responsiblePoc:
+          type: string
+        estimatedCostUsd:
+          type: integer
+        remediationPlan:
+          type: string
+    PoamItemUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - open
+          - in_progress
+          - completed
+          - accepted_risk
+          - cancelled
+        milestone:
+          type: string
+        scheduledCompletionDate:
+          type: string
+          format: date-time
+        actualCompletionDate:
+          type: string
+          format: date-time
+        completionNotes:
+          type: string
+        estimatedCostUsd:
+          type: integer
+    PoamItem:
+      allOf:
+      - $ref: '#/components/schemas/PoamItemCreate'
+      - type: object
+        required:
+        - id
+        - systemId
+        - status
+        - createdAt
+        - updatedAt
+        properties:
+          id:
+            type: string
+          systemId:
+            type: string
+          status:
+            type: string
+            enum:
+            - open
+            - in_progress
+            - completed
+            - accepted_risk
+            - cancelled
+          actualCompletionDate:
+            type: string
+            format: date-time
+          completionNotes:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+    PoamListResponse:
+      type: object
+      required:
+      - total
+      - limit
+      - offset
+      - items
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PoamItem'
